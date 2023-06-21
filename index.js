@@ -1,16 +1,34 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express()
+app.use(bodyParser.urlencoded({ extended: false }))
+
+const hasAccess = (req, res, next) => {
+    let allowAccess = true
+    if(allowAccess) {
+        next()
+    } else {
+        res.send ({message: 'Sorry, you cannot access this page!'})
+    }
+}
 
 app.get('/', (req, res) => {
-    res.send('Everything is working fine!')
-})
-
-app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/login.html')
 })
 
-app.get('/products', (req, res) => {
+app.post('/login', (req, res) => {
+    let registeredEmail = 'prabal@gmail.com'
+    let registeredPassword = '123'
+    const { email, password } = req.body
+    if(email === registeredEmail && password === registeredPassword) {
+        res.send({message: 'Logged in successfully!'})
+    } else {
+        res.send({error: 'Invalid credentials!'})
+    }
+})
+
+app.get('/products', hasAccess, (req, res) => {
     const products = [
         {
             id: 1,
